@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  build-apk:
+    build: .
+    volumes:
+      - ./output:/output
+      - .:/app
+    environment:
+      - GRADLE_OPTS=-Dorg.gradle.daemon=false
+    command: >
+      sh -c "
+        mkdir -p android/app/src/main/assets &&
+        npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res &&
+        cd android &&
+        ./gradlew assembleRelease &&
+        cp app/build/outputs/apk/release/app-release.apk /output/ &&
+        echo 'APK built successfully! Check ./output directory.'
+      " 
